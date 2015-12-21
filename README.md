@@ -70,11 +70,12 @@ instances rather than inspecting them to see if they are the same.
 
 `diff.objects` will return the differences between two objects and may be useful to run on an array if there may have
 been changes to its properties, since `diff.values` will default to using `diff.arrays` under the hood and won't check
-for property changes. This will throw an error if either value is not an object/array.
+for property changes. This will throw an error if either value is not an object/array. Will return an empty array if the
+objects are equal.
 
 `diff.arrays` checks the difference between two arrays, returning an array of splice objects or false if they are the
 same. This will throw an error of eitehr value is not an array. Using `diff.values` should be sufficent for most use
-cases.
+cases. Will return an empty array if the arrays are equal.
 
 ## Contributions and Issues
 
