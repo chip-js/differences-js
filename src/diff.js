@@ -43,11 +43,14 @@ var diff = exports;
   }
 
   // A splice record for the array changes
-  function Splice(index, removed, addedCount) {
+  function Splice(object, index, removed, addedCount) {
+    ChangeRecord.call(this, object, 'splice', String(index));
     this.index = index;
     this.removed = removed;
     this.addedCount = addedCount;
   }
+
+  Splice.prototype = Object.create(ChangeRecord.prototype);
 
 
   // Creates a clone or copy of an array or object (or simply returns a string/number/boolean which are immutable)
@@ -143,38 +146,41 @@ var diff = exports;
   //   oldValue: oldValue
   // }
   // ```
-  function diffObjects(object, oldObject) {
+  function diffObjects(value, oldValue) {
+    if ( !(value && oldValue && typeof value === 'object' && typeof oldValue === 'object')) {
+      throw new TypeError('Both values for diff.object must be objects');
+    }
     var changeRecords = [];
-    var prop, oldValue, value;
+    var prop, propOldValue, propValue;
 
     // Goes through the old object (should be a clone) and look for things that are now gone or changed
-    for (prop in oldObject) {
-      oldValue = oldObject[prop];
-      value = object[prop];
+    for (prop in oldValue) {
+      propOldValue = oldValue[prop];
+      propValue = value[prop];
 
       // Allow for the case of obj.prop = undefined (which is a new property, even if it is undefined)
-      if (value !== undefined && !diffBasic(value, oldValue)) {
+      if (propValue !== undefined && !diffBasic(propValue, propOldValue)) {
         continue;
       }
 
       // If the property is gone it was removed
-      if (! (prop in object)) {
-        changeRecords.push(new ChangeRecord(object, 'deleted', prop, oldValue));
-      } else if (diffBasic(value, oldValue)) {
-        changeRecords.push(new ChangeRecord(object, 'updated', prop, oldValue));
+      if (! (prop in value)) {
+        changeRecords.push(new ChangeRecord(value, 'delete', prop, propOldValue));
+      } else if (diffBasic(propValue, propOldValue)) {
+        changeRecords.push(new ChangeRecord(value, 'update', prop, propOldValue));
       }
     }
 
     // Goes through the old object and looks for things that are new
-    for (prop in object) {
-      value = object[prop];
-      if (! (prop in oldObject)) {
-        changeRecords.push(new ChangeRecord(object, 'new', prop));
+    for (prop in value) {
+      propValue = value[prop];
+      if (! (prop in oldValue)) {
+        changeRecords.push(new ChangeRecord(value, 'add', prop));
       }
     }
 
-    if (Array.isArray(object) && object.length !== oldObject.length) {
-      changeRecords.push(new ChangeRecord(object, 'updated', 'length', oldObject.length));
+    if (Array.isArray(value) && value.length !== oldValue.length) {
+      changeRecords.push(new ChangeRecord(value, 'update', 'length', oldValue.length));
     }
 
     return changeRecords;
@@ -199,6 +205,10 @@ var diff = exports;
   // }
   // ```
   function diffArrays(value, oldValue) {
+    if (!Array.isArray(value) || !Array.isArray(oldValue)) {
+      throw new TypeError('Both values for diff.array must be arrays');
+    }
+
     var currentStart = 0;
     var currentEnd = value.length;
     var oldStart = 0;
@@ -219,12 +229,12 @@ var diff = exports;
 
     // if nothing was added, only removed from one spot
     if (currentStart === currentEnd) {
-      return [ new Splice(currentStart, oldValue.slice(oldStart, oldEnd), 0) ];
+      return [ new Splice(value, currentStart, oldValue.slice(oldStart, oldEnd), 0) ];
     }
 
     // if nothing was removed, only added to one spot
     if (oldStart === oldEnd) {
-      return [ new Splice(currentStart, [], currentEnd - currentStart) ];
+      return [ new Splice(value, currentStart, [], currentEnd - currentStart) ];
     }
 
     // a mixture of adds and removes
@@ -248,7 +258,7 @@ var diff = exports;
         oldIndex++;
       } else if (op === EDIT_UPDATE) {
         if (!splice) {
-          splice = new Splice(index, [], 0);
+          splice = new Splice(value, index, [], 0);
         }
 
         splice.addedCount++;
@@ -258,14 +268,14 @@ var diff = exports;
         oldIndex++;
       } else if (op === EDIT_ADD) {
         if (!splice) {
-          splice = new Splice(index, [], 0);
+          splice = new Splice(value, index, [], 0);
         }
 
         splice.addedCount++;
         index++;
       } else if (op === EDIT_DELETE) {
         if (!splice) {
-          splice = new Splice(index, [], 0);
+          splice = new Splice(value, index, [], 0);
         }
 
         splice.removed.push(oldValue[oldIndex]);

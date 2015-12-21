@@ -59,6 +59,23 @@ if (splices) {
 }
 ```
 
+### Other Methods
+
+`diff.values` should be enough for most situations. It will even tell if you if two dates are the same date or not. But
+other methods may be useful. All of these methods are used by `diff.arrays` after determining the type of the two
+values.
+
+`diff.basic` diffs two basic values. If you pass in two arrays or objects it will return true if they are different
+instances rather than inspecting them to see if they are the same.
+
+`diff.objects` will return the differences between two objects and may be useful to run on an array if there may have
+been changes to its properties, since `diff.values` will default to using `diff.arrays` under the hood and won't check
+for property changes. This will throw an error if either value is not an object/array.
+
+`diff.arrays` checks the difference between two arrays, returning an array of splice objects or false if they are the
+same. This will throw an error of eitehr value is not an array. Using `diff.values` should be sufficent for most use
+cases.
+
 ## Contributions and Issues
 
 Please open a ticket for any bugs or feature requests.
