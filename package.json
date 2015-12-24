@@ -13,16 +13,13 @@
     "email": "jacwright@gmail.com",
     "url": "http://github.com/jacwright"
   },
+  "license": "MIT",
   "repository": {
     "type": "git",
     "url": "https://github.com/chip-js/differences-js.git"
   },
   "bugs": {
     "url": "https://github.com/chip-js/differences-js/issues"
-  },
-  "licenses": {
-    "type": "MIT",
-    "url": "git://github.com/chip-js/differences-js/LICENSE"
   },
   "scripts": {
     "test": "mocha test"
