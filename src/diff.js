@@ -141,7 +141,7 @@ var diff = exports;
   // ```javascript
   // {
   //   object: object,
-  //   type: 'deleted|updated|new',
+  //   type: 'delete|update|add',
   //   name: 'propertyName',
   //   oldValue: oldValue
   // }

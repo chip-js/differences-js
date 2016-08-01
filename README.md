@@ -45,7 +45,7 @@ if (changes) {
 }
 ```
 
-Each change in a list of object changes will have a `type` of `"new"`, `"updated"`, or `"deleted"`.
+Each change in a list of object changes will have a `type` of `"add"`, `"update"`, or `"delete"`.
 
 You can find the changes between two arrays.
 
