@@ -1,6 +1,6 @@
 {
   "name": "differences-js",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Checks if there are any differences between two objects and provides the difference.",
   "keywords": [
     "templates",
